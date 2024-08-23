@@ -199,11 +199,17 @@ vim.keymap.set('n', '<esc>', '<cmd>noh<cr><esc>', { silent = true })
 
 vim.o.scrolloff = 999
 
+vim.keymap.set('n', '<c-l>', '<cmd>bn<cr>', { silent = true, desc = 'Next buffer' })
+vim.keymap.set('n', '<c-h>', '<cmd>bp<cr>', { silent = true, desc = 'Previous buffer' })
+
 -- I use J and K to go up and down quickly, while keeping jump list clean
 vim.keymap.set('n', '}', '<cmd><c-u>execute "keepjumps norm! " . v:count1 . "}"<cr>', { silent = true })
 vim.keymap.set('n', '{', '<cmd><c-u>execute "keepjumps norm! " . v:count1 . "{"<cr>', { silent = true })
 vim.keymap.set('n', 'J', '}', { silent = true })
 vim.keymap.set('n', 'K', '{', { silent = true })
+
+-- Remap for joining lines, since J is now a motion. But you can also leave this off and do :j as a command
+vim.keymap.set('n', 'gJ', '<cmd>join<cr>', { silent = true })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -417,6 +423,24 @@ require('lazy').setup({
     end,
   },
 
+  {
+    -- Set lualine as statusline
+    'nvim-lualine/lualine.nvim',
+    -- See `:help lualine.txt`
+    opts = {
+      options = {
+        icons_enabled = false,
+        theme = 'onedark',
+        component_separators = '|',
+        section_separators = '',
+      },
+      tabline = {
+        lualine_a = { 'buffers' },
+        lualine_z = { 'tabs' }
+      }
+    },
+  },
+
   -- LSP Plugins
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
@@ -597,7 +621,6 @@ require('lazy').setup({
         -- tsserver = {},
         --
 
-        rubyfmt = {},
         elixirls = {},
         rust_analyzer = {},
 
@@ -720,6 +743,7 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      'rafamadriz/friendly-snippets',
     },
     config = function()
       -- See `:help cmp`
@@ -752,11 +776,11 @@ require('lazy').setup({
           -- Accept ([y]es) the completion.
           --  This will auto-import if your LSP supports it.
           --  This will expand snippets if the LSP sent a snippet.
-          ['<C-y>'] = cmp.mapping.confirm { select = true },
+          -- ['<C-y>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
-          --['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<CR>'] = cmp.mapping.confirm { select = true },
           --['<Tab>'] = cmp.mapping.select_next_item(),
           --['<S-Tab>'] = cmp.mapping.select_prev_item(),
 
