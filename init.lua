@@ -625,6 +625,8 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
+        ruby_lsp = {},
+        terraformls = {},
 
         elixirls = {},
         rust_analyzer = {},
