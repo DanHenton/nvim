@@ -625,7 +625,7 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
-        ruby_lsp = {},
+        ruby_lsp = { cmd = { "ruby-lsp" } },
         terraformls = {},
 
         elixirls = {},
@@ -711,6 +711,8 @@ require('lazy').setup({
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      },
+      formatters = {
       },
     },
   },
