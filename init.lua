@@ -625,8 +625,13 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
+        dockerls = {},
+        docker_compose_language_service = {},
         ruby_lsp = {},
         terraformls = {},
+        bashls = {},
+        html = {},
+        jsonls = {},
 
         elixirls = {},
         rust_analyzer = {},
