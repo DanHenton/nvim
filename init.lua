@@ -416,18 +416,21 @@ require('lazy').setup({
         }
       end, { desc = '[S]earch [/] in Open Files' })
 
-      -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>sn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
+
+      -- Search for the word under the cursor using Ag
+      vim.keymap.set('n', '<leader>sa', 'yaw:Ag <C-r>0<CR>', {
+        noremap = true,
+        desc = "Ggrep for word under cursor",
+      })
     end,
   },
-
   {
     "kelly-lin/telescope-ag",
     dependencies = { "nvim-telescope/telescope.nvim" },
   },
-
   {
     -- Set lualine as statusline
     'nvim-lualine/lualine.nvim',
