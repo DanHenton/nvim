@@ -157,6 +157,26 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+vim.diagnostic.config(
+    {
+        underline = false,
+        virtual_text = {
+            spacing = 2,
+            prefix = "●",
+        },
+        update_in_insert = false,
+        severity_sort = true,
+        signs = {
+            text = {
+                [vim.diagnostic.severity.ERROR] = " ",
+                [vim.diagnostic.severity.WARN]  = " ",
+                [vim.diagnostic.severity.HINT]  = " ",
+                [vim.diagnostic.severity.INFO]  = " ",
+            },
+        },
+    }
+)
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -292,7 +312,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  {                     -- Useful plugin to show you pending keybinds.
+  { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
@@ -340,7 +360,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -424,8 +444,8 @@ require('lazy').setup({
   },
 
   {
-    "kelly-lin/telescope-ag",
-    dependencies = { "nvim-telescope/telescope.nvim" },
+    'kelly-lin/telescope-ag',
+    dependencies = { 'nvim-telescope/telescope.nvim' },
   },
 
   {
@@ -441,8 +461,8 @@ require('lazy').setup({
       },
       tabline = {
         lualine_a = { 'buffers' },
-        lualine_z = { 'tabs' }
-      }
+        lualine_z = { 'tabs' },
+      },
     },
   },
 
@@ -459,7 +479,7 @@ require('lazy').setup({
       },
     },
   },
-  { 'Bilal2453/luvit-meta',     lazy = true },
+  { 'Bilal2453/luvit-meta', lazy = true },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -471,7 +491,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
@@ -623,8 +643,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
-        --
+        ts_ls = {},
         dockerls = {},
         docker_compose_language_service = {},
         ruby_lsp = {},
@@ -632,7 +651,6 @@ require('lazy').setup({
         bashls = {},
         html = {},
         jsonls = {},
-
         elixirls = {},
         rust_analyzer = {},
 
@@ -916,6 +934,7 @@ require('lazy').setup({
         'elixir',
         'eex',
         'javascript',
+        'typescript',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,
