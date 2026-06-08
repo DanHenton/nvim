@@ -384,15 +384,12 @@ require('lazy').setup({
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
-        -- You can put your default mappings / updates / etc. in here
-        --  All the info you're looking for is in `:help telescope.setup()`
-        --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
-        -- pickers = {}
+        defaults = {
+          -- telescope.nvim's previewer calls nvim-treesitter v0 APIs (parsers.ft_to_lang,
+          -- configs.is_enabled) that were removed on the nvim-treesitter main branch.
+          -- Disable telescope's TS integration; previews fall back to vim regex syntax.
+          preview = { treesitter = false },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -445,6 +442,19 @@ require('lazy').setup({
   {
     'kelly-lin/telescope-ag',
     dependencies = { 'nvim-telescope/telescope.nvim' },
+    config = function()
+      require('telescope-ag').setup {
+        cmd = { 'ag', '--vimgrep' },
+      }
+      require('telescope').load_extension 'ag'
+      vim.keymap.set('n', '<leader>sa', function()
+        vim.ui.input({ prompt = 'Ag search: ' }, function(pattern)
+          if pattern and pattern ~= '' then
+            require('telescope').extensions.ag.search(pattern)
+          end
+        end)
+      end, { desc = '[S]earch with [A]g' })
+    end,
   },
 
   {
@@ -878,51 +888,38 @@ require('lazy').setup({
   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
-    branch = 'master',
-    build = ':TSUpdate',
-    opts = {
-      ensure_installed = {
-        'bash',
-        'c',
-        'diff',
-        'html',
-        'lua',
-        'luadoc',
-        'markdown',
-        'markdown_inline',
-        'query',
-        'vim',
-        'vimdoc',
-        'ruby',
-        'rust',
-        'elixir',
-        'eex',
-        'javascript',
-        'typescript',
-      },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
-    config = function(_, opts)
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+    branch = 'main',
+    lazy = false,
+    build = function()
+      require('nvim-treesitter').update()
+    end,
+    config = function()
+      local ensure_installed = {
+        'bash', 'c', 'diff', 'html', 'lua', 'luadoc',
+        'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
+        'ruby', 'rust', 'elixir', 'eex', 'javascript', 'typescript',
+      }
 
-      ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
+      local nts = require('nvim-treesitter')
+      local installed = {}
+      for _, lang in ipairs(nts.get_installed('parsers')) do installed[lang] = true end
+      local missing = vim.tbl_filter(function(lang) return not installed[lang] end, ensure_installed)
+      if #missing > 0 then nts.install(missing) end
 
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+      -- Per-buffer highlight + indent; ruby keeps vim regex highlighting and default indent
+      -- (kickstart behavior preserved from the old configs API)
+      vim.api.nvim_create_autocmd('FileType', {
+        group = vim.api.nvim_create_augroup('kickstart-treesitter', { clear = true }),
+        callback = function(ev)
+          local ft = ev.match
+          local lang = vim.treesitter.language.get_lang(ft) or ft
+          if not vim.treesitter.language.add(lang) then return end
+          pcall(vim.treesitter.start, ev.buf, lang)
+          if ft ~= 'ruby' then
+            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
     end,
   },
 
