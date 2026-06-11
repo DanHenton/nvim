@@ -454,6 +454,7 @@ require('lazy').setup({
           -- This is where a variable was first declared, or where a function is defined, etc.
           -- To jump back, press <C-t>.
           vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+          vim.keymap.set('n', '<C-]>', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition (Telescope)' })
 
           -- Fuzzy find all the symbols in your current document.
           -- Symbols are things like variables, functions, types, etc.
@@ -658,13 +659,20 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        ruby_lsp = { cmd = { 'ruby-lsp' } },
+        ruby_lsp = { cmd = { 'ruby-lsp' }, filetypes = { 'ruby', 'eruby' } },
+        herb_ls = {
+          -- Herb's constant resolution is unreliable; let ruby_lsp own go-to-definition.
+          on_attach = function(client)
+            client.server_capabilities.definitionProvider = false
+            client.server_capabilities.referencesProvider = false
+          end,
+        },
         ts_ls = {},
         dockerls = {},
         docker_compose_language_service = {},
         terraformls = {},
         bashls = {},
-        html = {},
+        html = { filetypes = { 'html', 'eruby' } },
         jsonls = {},
         elixirls = {},
         rust_analyzer = {},
